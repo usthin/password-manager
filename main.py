@@ -1,14 +1,19 @@
 import tkinter as tk
-from tkinter import messagebox
 from auth import register, login
 from crypto_utils import decrypt_file
 from password_manager import PasswordManager
+from tkinter import messagebox
+
+
+def start_login():
+    root = tk.Tk()
+    LoginWindow(root)
+    root.mainloop()
 
 
 class LoginWindow:
     def __init__(self, root):
         self.root = root
-
         root.title("Login")
         root.geometry("300x250")
 
@@ -49,6 +54,5 @@ class LoginWindow:
             messagebox.showerror("Error", "Invalid credentials")
 
 
-root = tk.Tk()
-LoginWindow(root)
-root.mainloop()
+if __name__ == "__main__":
+    start_login()
