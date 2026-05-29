@@ -43,35 +43,42 @@ def decrypt_text(username, encrypted_text):
 
 
 def encrypt_file(username):
-    path = f"users/{username}/passwords.csv"
 
-    if not os.path.exists(path):
+    csv_path = f"users/{username}/passwords.csv"
+    enc_path = f"users/{username}/passwords.enc"
+
+    if not os.path.exists(csv_path):
         return
 
-    with open(path, "rb") as f:
+    with open(csv_path, "rb") as f:
         data = f.read()
 
     cipher = get_cipher(username)
-    encrypted_data = cipher.encrypt(data)
+    encrypted = cipher.encrypt(data)
 
-    with open(f"users/{username}/passwords.enc", "wb") as f:
-        f.write(encrypted_data)
+    with open(enc_path, "wb") as f:
+        f.write(encrypted)
 
-    os.remove(path)
-
+    # DO NOT DELETE FILE IF YOU WANT SAFETY
+    # OR only delete AFTER successful encryption
+    os.remove(csv_path)
 
 import os
 
 def decrypt_file(username):
+
     enc_path = f"users/{username}/passwords.enc"
     csv_path = f"users/{username}/passwords.csv"
 
-    folder = f"users/{username}"
-
-    # ✅ IMPORTANT: ensure folder exists
-    os.makedirs(folder, exist_ok=True)
-
     if not os.path.exists(enc_path):
-        # create empty CSV safely
-        with open(csv_path, "w") as f:
-            f
+        open(csv_path, "w").close()
+        return
+
+    with open(enc_path, "rb") as f:
+        encrypted = f.read()
+
+    cipher = get_cipher(username)
+    decrypted = cipher.decrypt(encrypted)
+
+    with open(csv_path, "wb") as f:
+        f.write(decrypted)
