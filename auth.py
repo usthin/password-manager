@@ -1,8 +1,9 @@
+import os
 import bcrypt
 import json
-import os
 
 USERS_FILE = "users.json"
+BASE = "users"
 
 
 def load_users():
@@ -10,35 +11,43 @@ def load_users():
         return {}
 
     with open(USERS_FILE, "r") as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except:
+            return {}
 
 
 def save_users(users):
     with open(USERS_FILE, "w") as f:
-        json.dump(users, f)
+        json.dump(users, f, indent=4)
 
 
 def register(username, password):
+
     users = load_users()
 
     if username in users:
         return False
 
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    # create user folder HERE ✅ IMPORTANT FIX
+    user_path = f"{BASE}/{username}"
+    os.makedirs(user_path, exist_ok=True)
 
-    users[username] = hashed.decode()
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
+    users[username] = hashed
     save_users(users)
 
     return True
 
 
 def login(username, password):
+
     users = load_users()
 
     if username not in users:
         return False
 
-    stored_hash = users[username].encode()
+    stored = users[username].encode()
 
-    return bcrypt.checkpw(password.encode(), stored_hash)
+    return bcrypt.checkpw(password.encode(), stored)
